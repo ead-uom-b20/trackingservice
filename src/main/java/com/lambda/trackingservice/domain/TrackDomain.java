@@ -15,6 +15,7 @@ import java.time.LocalDateTime;
 public class TrackDomain {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
     @Column(name="orderid")
     private Long orderID;
