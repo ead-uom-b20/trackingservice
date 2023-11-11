@@ -13,6 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
@@ -23,8 +24,9 @@ public class TrackServiceImpl implements TrackService {
     private final ServiceUtil serviceUtil;
     private final TrackRepository trackRepository;
     private final MailServiceFeignClient mailServiceFeignClient;
+
     @Override
-    public ResponseDto tracking(String TrackStatus,Long orderid) {
+    public ResponseDto tracking(String TrackStatus, Long orderid) {
         ResponseDto responseDto;
         List<String> trackings = new ArrayList<>();
         trackings.add("Order Placed");
@@ -32,13 +34,13 @@ public class TrackServiceImpl implements TrackService {
         trackings.add("Out for Delivery");
         trackings.add("Picked Up for Delivery");
         trackings.add("Order Delivered");
-        try{
+        try {
 
-            if(!trackings.contains(TrackStatus)){
+            if (!trackings.contains(TrackStatus)) {
                 return responseDto = serviceUtil.getErrorServiceResponse("No valid transaction !");
             }
 
-            TrackDomain savedTrackingInfo =trackRepository.save(
+            TrackDomain savedTrackingInfo = trackRepository.save(
                     TrackDomain.builder()
                             .orderID(orderid)
                             .status(TrackStatus)
@@ -47,23 +49,42 @@ public class TrackServiceImpl implements TrackService {
 
             // mail started
             MailServiceRequestBodyDto body = MailServiceRequestBodyDto.builder()
-                    .subject(TrackStatus +" Successfully")
+                    .subject(TrackStatus + " Successfully")
                     .to("ragurajsivanantham@gmail.com")
-                    .html("<h1>Hi,"+TrackStatus+" Successfully")
+                    .html("<h1>Hi," + TrackStatus + " Successfully")
                     .password("$windowsLaptop$")
                     .build();
             MailServiceResponseDto mailServiceResponseDto = mailServiceFeignClient.sendMail(body);
-            if(Objects.equals(mailServiceResponseDto.getStatus(), "true")){
+            if (Objects.equals(mailServiceResponseDto.getStatus(), "true")) {
                 log.info("AppLog >>> mail service success");
-            }else{
+            } else {
                 log.info("AppLog >>> mail service failed");
             }
 
             responseDto = serviceUtil.getServiceResponse(savedTrackingInfo);
-        }catch (Exception e){
-            responseDto = serviceUtil.getErrorServiceResponse("Errror Saving...");
+        } catch (Exception e) {
+            responseDto = serviceUtil.getErrorServiceResponse("Error Saving...");
         }
         return responseDto;
     }
 
+    @Override
+    public ResponseDto getTrackingByStatus(String orderStatus) {
+        try {
+            List<TrackDomain> trackingInfo = trackRepository.findByStatus(orderStatus);
+            return serviceUtil.getServiceResponse(trackingInfo);
+        } catch (Exception e) {
+            return serviceUtil.getErrorServiceResponse("Error retrieving tracking information by status");
+        }
+    }
+
+    @Override
+    public ResponseDto getTrackingByOrderId(Long orderId) {
+        try {
+            List<TrackDomain> trackingInfo = trackRepository.findByOrderID(orderId);
+            return serviceUtil.getServiceResponse(trackingInfo);
+        } catch (Exception e) {
+            return serviceUtil.getErrorServiceResponse("Error retrieving tracking information by order ID");
+        }
+    }
 }

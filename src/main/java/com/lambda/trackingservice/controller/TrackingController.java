@@ -3,10 +3,7 @@ package com.lambda.trackingservice.controller;
 import com.lambda.trackingservice.dto.ResponseDto;
 import com.lambda.trackingservice.service.TrackService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -22,5 +19,14 @@ public class TrackingController {
 
 
     // get by order status: order placed...
+    @GetMapping("/tracking/status/{orderStatus}")
+    public ResponseDto getTrackingByStatus(@PathVariable("orderStatus") String orderStatus) {
+        return trackService.getTrackingByStatus(orderStatus);
+    }
+
     // get order racking by orderid; ==> all all data about ord id :1
+    @GetMapping("/tracking/order/{orderId}")
+    public ResponseDto getTrackingByOrderId(@PathVariable("orderId") Long orderId) {
+        return trackService.getTrackingByOrderId(orderId);
+    }
 }
