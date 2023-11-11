@@ -11,29 +11,20 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @Builder
 @Entity
-@Table(name = "orders")
-public class OrderDomain {
+@Table(name = "track")
+public class TrackDomain {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
 
-    @Column(name = "productId")
-    private Long productId;
+    @Column(name="orderid")
+    private Long orderID;
 
-    @Column(name = "userId")
-    private Long userId;
-
-    @Column(name = "deliveryPersonId")
-    private Long deliveryPersonId;
-
-    @Column(name = "quantity")
-    private Long quantity;
+    @Column(name="status")
+    private String status;
 
     @Column(name = "dateTime")
     private LocalDateTime dateTime;
 
-    @Column(name = "status")
-    private String status;
 
     @PrePersist
     private void setDefaultDateTime() {
@@ -42,3 +33,4 @@ public class OrderDomain {
         }
     }
 }
+
